@@ -4,6 +4,8 @@ from scipy.misc import imread
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm 
 
+
+
 def rgb2grey(pixel):
 	return math.floor(0.299*pixel[0] + 0.587*pixel[1] + 0.114*pixel[2])
 
@@ -14,20 +16,32 @@ def greyscale(img):
 			greyimg[rownum][colnum] = rgb2grey(img[rownum][colnum])
 	return greyimg
 
-def normalization(grey):
+def equalization(grey):
 	#creating a greyscale version
 	[rows, cols] = grey.shape
 
 	grey_max = np.amax(grey)
 	grey_min = np.amin(grey)
 	width  = grey_max - grey_min
-
-	#normalizing the greyscale image
-	normal = np.zeros((grey.shape[0], grey.shape[1]))
-	normal = np.floor((grey-grey_min)*255*1.0/width)
-
-	return normal
 	
+	brightness = np.zeros(256)
+	
+	for y in range(rows):
+		for x in range(cols):
+			brightness[grey[y][x]] = brightness[grey[y][x]] + 1
+	
+	sum = 0
+	hist = np.zeros(256)
+	for level in range(256):
+		sum = sum + brightness[level]
+		hist[level] = np.floor((width*sum)/(rows*cols))
+
+	equal = np.zeros((grey.shape[0], grey.shape[1]))
+	for r in range(rows):
+		for c in range(cols):
+			equal[r][c] = hist[grey[r][c]]
+	return equal
+
 if __name__ == "__main__":
 	
 	img = imread('lena.png')
@@ -37,16 +51,14 @@ if __name__ == "__main__":
 	grey = greyscale(img)
 	plt.imshow(grey, cmap = cm.gray)
 	plt.show()
-	#histogram of grayscale image
+
 	plt.hist(grey)
 	plt.show()
 
-	normal = normalization(grey)
+	equal = equalization(grey)
 
-	plt.imshow(normal, cmap = cm.gray)
-	plt.show()
-	#histogram of normalized image
-	plt.hist(normal)
+	plt.imshow(equal, cmap = cm.gray)
 	plt.show()
 
-
+	plt.hist(equal)
+	plt.show()

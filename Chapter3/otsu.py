@@ -14,20 +14,29 @@ def greyscale(img):
 			greyimg[rownum][colnum] = rgb2grey(img[rownum][colnum])
 	return greyimg
 
-def normalization(grey):
-	#creating a greyscale version
+def otsu_thresh(grey):
 	[rows, cols] = grey.shape
-
-	grey_max = np.amax(grey)
-	grey_min = np.amin(grey)
-	width  = grey_max - grey_min
-
-	#normalizing the greyscale image
-	normal = np.zeros((grey.shape[0], grey.shape[1]))
-	normal = np.floor((grey-grey_min)*255*1.0/width)
-
-	return normal
 	
+	histo = np.zeros(256)
+	for y in range(rows):
+		for x in range(cols):
+			histo[grey[y][x]] = histo[grey[y][x]] + 1
+
+	hist_image = histo*1.0/(rows*cols)
+	ut = 0
+	for k in range(256):
+		ut = ut + k*hist_image[k]
+	w = 0
+	u = 0
+	values = np.zeros(256)
+
+	for k in range(255):
+		w = w + hist_image[k]
+		u = u + k*hist_image[k]		
+		values[k] = ((ut*w - u)**2)/(w*(1-w))
+	otsu = np.argmax(values)
+	return otsu
+
 if __name__ == "__main__":
 	
 	img = imread('lena.png')
@@ -37,16 +46,17 @@ if __name__ == "__main__":
 	grey = greyscale(img)
 	plt.imshow(grey, cmap = cm.gray)
 	plt.show()
-	#histogram of grayscale image
-	plt.hist(grey)
+
+	otsu = otsu_thresh(grey)
+	print otsu
+
+	new_img = np.empty([grey.shape[0], grey.shape[1]])
+
+	new_img[grey>=otsu] = 255
+	new_img[grey<otsu] = 0
+
+	plt.imshow(new_img, cmap = cm.gray)
 	plt.show()
 
-	normal = normalization(grey)
-
-	plt.imshow(normal, cmap = cm.gray)
-	plt.show()
-	#histogram of normalized image
-	plt.hist(normal)
-	plt.show()
 
 
