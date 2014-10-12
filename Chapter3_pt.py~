@@ -78,7 +78,6 @@ for i in range(255):
 
 muT=mu[255]
 
-
 #plt.plot(w)
 #plt.show()
 thresh=0
