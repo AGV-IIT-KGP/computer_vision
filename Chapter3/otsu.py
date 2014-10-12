@@ -16,21 +16,18 @@ def greyscale(img):
 
 def otsu_thresh(grey):
 	[rows, cols] = grey.shape
-	
-	histo = np.zeros(256)
-	for y in range(rows):
-		for x in range(cols):
-			histo[grey[y][x]] = histo[grey[y][x]] + 1
 
+	histo, bin_edges = np.histogram(grey, bins = range(256))
+	histo = np.array(histo)
 	hist_image = histo*1.0/(rows*cols)
 	ut = 0
-	for k in range(256):
+	for k in range(254):
 		ut = ut + k*hist_image[k]
 	w = 0
 	u = 0
 	values = np.zeros(256)
 
-	for k in range(255):
+	for k in range(254):
 		w = w + hist_image[k]
 		u = u + k*hist_image[k]		
 		values[k] = ((ut*w - u)**2)/(w*(1-w))
