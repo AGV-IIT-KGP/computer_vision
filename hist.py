@@ -10,7 +10,5 @@ for i in range(0,512):
 		bright=lenag[i,j]
 		pixels[bright]=pixels[bright]+1
 
-histo, bins =np.histogram(lenag, bins=range(255))
-
 plt.plot(a,pixels)
 plt.show()

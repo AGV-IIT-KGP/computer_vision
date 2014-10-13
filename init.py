@@ -76,6 +76,3 @@ def normalize(img):
 	imgN=np.floor((img-mini)*(255.0/imgRange))
 	return imgN
 
-
-lenag=imread('lenag.bmp')
-plt.imshow(normalize(lenag))
