@@ -2,13 +2,13 @@ import numpy as np
 import math
 from scipy.misc import imread
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm 
+import matplotlib.cm as cm
 
 def rgb2grey(pixel):
 	return math.floor(0.299*pixel[0] + 0.587*pixel[1] + 0.114*pixel[2])
 
 def greyscale(img):
-	greyimg = np.zeros((img.shape[0], img.shape[1])) 
+	greyimg = np.zeros((img.shape[0], img.shape[1]))
 	for rownum in range(len(img)):
 		for colnum in range(len(img[rownum])):
 			greyimg[rownum][colnum] = rgb2grey(img[rownum][colnum])
@@ -29,13 +29,23 @@ def otsu_thresh(grey):
 
 	for k in range(254):
 		w = w + hist_image[k]
-		u = u + k*hist_image[k]		
+		u = u + k*hist_image[k]
 		values[k] = ((ut*w - u)**2)/(w*(1-w))
 	otsu = np.argmax(values)
 	return otsu
 
+
+def test():
+    from skimage.filter import threshold_otsu
+    img = imread('lena.bmp')
+    grey = greyscale(img)
+    sk_thres = np.floor(threshold_otsu(grey))
+    my_thres = otsu_thresh(grey)
+    assert sk_thres == my_thres
+
+
 if __name__ == "__main__":
-	
+
 	img = imread('lena.png')
 	plt.imshow(img)
 	plt.show()
@@ -54,6 +64,3 @@ if __name__ == "__main__":
 
 	plt.imshow(new_img, cmap = cm.gray)
 	plt.show()
-
-
-
