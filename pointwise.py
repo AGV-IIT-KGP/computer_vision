@@ -17,8 +17,8 @@ def equalize(img):
 		sumt=sumt+pixels[level]
 		q[level]=math.floor((255*sumt)/(512*512)+0.00001)
 	imgEq=img.copy()
-	for x in range(0,512):
-		for y in range(0,512):
+	for x in range(0,rows):
+		for y in range(0,cols):
 			imgEq[x,y]=q[img[x,y]]
 	return imgEq
 
