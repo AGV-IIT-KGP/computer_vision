@@ -2,7 +2,7 @@ import numpy as np
 import math
 from scipy.misc import imread
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+import matplotlib.cm as cm 
 
 def greyscale(rgb):
 	return np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
@@ -10,34 +10,22 @@ def greyscale(rgb):
 def otsu_thresh(grey):
 	[rows, cols] = grey.shape
 
-	histo, bin_edges = np.histogram(grey, bins = range(255))
+	histo, bin_edges = np.histogram(grey, bins = range(256))
 	histo = np.array(histo)
 	hist_image = histo*1.0/(rows*cols)
 	ut = 0
-	for k in range(1, 255):
-		ut = ut + k*hist_image[k-1]
+	for k in range(254):
+		ut = ut + k*hist_image[k]
 	w = 0
 	u = 0
-	values = np.zeros(255)
+	values = np.zeros(256)
 
-	for k in range(1, 255):
-		w = w + hist_image[k-1]
-		u = u + k*hist_image[k-1]		
+	for k in range(254):
+		w = w + hist_image[k]
+		u = u + k*hist_image[k]		
 		values[k] = ((ut*w - u)**2)/(w*(1-w))
-	duh = values.argsort()[-3:][::-1]
-	print duh
 	otsu = np.argmax(values)
 	return otsu
-
-def test():
-    from skimage.filter import threshold_otsu
-    img = imread('lena.png')
-    grey = greyscale(img)
-    sk_thres = np.floor(threshold_otsu(grey))
-    my_thres = otsu_thresh(grey)
-    print sk_thres, my_thres
-    assert sk_thres == my_thres
-
 
 if __name__ == "__main__":
 	
@@ -59,4 +47,6 @@ if __name__ == "__main__":
 
 	plt.imshow(new_img, cmap = cm.gray)
 	plt.show()
-	test()
+
+
+

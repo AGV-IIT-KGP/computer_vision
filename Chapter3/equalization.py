@@ -4,18 +4,9 @@ from scipy.misc import imread
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm 
 
-
-
-def rgb2grey(pixel):
-	return math.floor(0.299*pixel[0] + 0.587*pixel[1] + 0.114*pixel[2])
-
-def greyscale(img):
-	greyimg = np.zeros((img.shape[0], img.shape[1])) 
-	for rownum in range(len(img)):
-		for colnum in range(len(img[rownum])):
-			greyimg[rownum][colnum] = rgb2grey(img[rownum][colnum])
-	return greyimg
-
+def greyscale(rgb):
+	return np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
+	
 def equalization(grey):
 	#creating a greyscale version
 	[rows, cols] = grey.shape
