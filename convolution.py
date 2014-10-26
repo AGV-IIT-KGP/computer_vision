@@ -32,7 +32,7 @@ def convolve(matA,matB):
 			sum = matA[i-center:i+center+1,y-center:y+center+1]*matB[center-center:center+center+1,center-center:center+center+1]
 			sum = np.sum(sum)/no
 			result[i,y] = sum
-	result = normalise(image)
+	result = normalise(result)
 	return result
 
 
