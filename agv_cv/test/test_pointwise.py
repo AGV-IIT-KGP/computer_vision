@@ -1,5 +1,5 @@
 import numpy as np
-from cv.pointoperators import inversion
+from agv_cv.pointoperators import inversion
 from numpy.testing import assert_equal, assert_almost_equal
 
 image = np.array([[0, 0, 1, 3, 5],
