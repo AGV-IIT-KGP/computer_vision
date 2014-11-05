@@ -8,6 +8,7 @@ from agv_cv.Lane_Detector.GrassRemoval import *
 
 hough_image = imread("/images/hough_grass.png")
 img = imread("/images/lane.png")
+
 def test_hough():
     gray = rgb2gray(img)
     gray = normalize(gray)  
