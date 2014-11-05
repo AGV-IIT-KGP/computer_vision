@@ -1,5 +1,4 @@
 import numpy as np
-from PIL import Image
 from scipy.misc import imread
 from scipy.misc import imsave
 from numpy.testing import assert_array_equal
