@@ -5,6 +5,7 @@ setup(name='agv_cv',
       packages=['agv_cv'],
       install_requires=[
           'scipy',
+          'pillow',
           'numpy',
       ],
       )
