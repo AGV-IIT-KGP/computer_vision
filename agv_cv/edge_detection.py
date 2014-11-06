@@ -6,10 +6,10 @@ import scipy.signal as sg
 
 
 def rgb2grey(image):
-	rows,cols,channels = image.shape
-	if (channels == 3):
-		image = np.mean(image,axis=2)
-	return image
+    rows,cols,channels = image.shape
+    if (channels == 3):
+        image = np.mean(image,axis=2)
+    return image
 
 def edgeDetection(image):
     image = rgb2grey(image)
@@ -20,8 +20,4 @@ def edgeDetection(image):
     return result
 
 
-if __name__=="__main__":
-    lena = imread('../images/lena.bmp')
-    lena1 = edgeDetection(lena)
-    plt.imshow(lena1,cmap=cm.Greys_r)
-    plt.show()
+
