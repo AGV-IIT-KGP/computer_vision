@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from hough import hough_transform
 
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.299, 0.587, 0.144])

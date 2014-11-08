@@ -3,8 +3,8 @@ from scipy.misc import imread
 from scipy.misc import imsave
 from numpy.testing import assert_array_equal
 
-from agv_cv.Lane_Detector.Hough import hough_transform
-from agv_cv.Lane_Detector.GrassRemoval import *
+from agv_cv.lanedetector.hough import hough_transform
+from agv_cv.lanedetector.grassremoval import *
 
 hough_image = imread("images/hough_grass.png")
 img = imread("images/lane.png")

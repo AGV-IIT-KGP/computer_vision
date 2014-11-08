@@ -1,2 +1,2 @@
-from .GrassRemoval import *
-from .Hough import *
+from .grassremoval import *
+from .hough import *
