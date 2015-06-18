@@ -1,5 +1,6 @@
 Computer Vision
 ===============
+![Build_status](https://travis-ci.org/AGV-IIT-KGP/computer_vision.svg?branch=master)  
 
 This is the computer vision stack for the Team [AGV-IIT-KGP](http://www.agv.iitkgp.ac.in/).
 Currently we are in the learning phase and are trying to implement the
