@@ -1,0 +1,4 @@
+Pillow>=2.6.1
+scikit-image>=0.10.1
+scipy>=0.14.0
+pytest>=2.6.3
