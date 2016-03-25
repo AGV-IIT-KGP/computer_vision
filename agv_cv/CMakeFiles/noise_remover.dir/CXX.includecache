@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tejus/Documents/computer_vision/computer_vision/agv_cv/noise_remover.cpp
+stdio.h
+-
+stdlib.h
+-
+opencv/cv.h
+/home/tejus/Documents/computer_vision/computer_vision/agv_cv/opencv/cv.h
+opencv2/highgui/highgui.hpp
+-
+bits/stdc++.h
+-
+typeinfo
+-
+iostream
+-
+vector
+-
+time.h
+-
+algorithm
+-
+cmath
+-
+
