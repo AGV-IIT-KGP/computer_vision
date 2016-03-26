@@ -18,6 +18,15 @@ typedef struct co_ord_ co_ord;
 
 void compute_quadratic(co_ord p1, co_ord p2, co_ord p3, float& a, float& b, float &c)
 {
+	if(p1.y==p2.y || p1.y==p3.y)	//error check for denominator in expression below
+	{
+		a=0;
+		b=0;
+		c=0;
+		return;
+	}
+
+	
 	a=( ((float)p1.x-p2.x)/(p1.y-p2.y)- ((float)p2.x-p3.x)/(p2.y-p3.y) )/((float)p1.y-p3.y);
 	b=( ((float)p1.x-p2.x)- a*(p1.y*p1.y- p2.y*p2.y) )/((float)p1.y-p2.y);
 	c=p1.x-a*p1.y*p1.y-b*p1.y;
@@ -49,7 +58,6 @@ int main()
 
 	medianBlur ( img, img, 15 );
 	//imshow("median blurred", img);
-	//waitKey(1);
 
 	Mat copy=img.clone();
 
@@ -62,6 +70,12 @@ int main()
 		{
 			if(img.at<uchar>(i,j)>=20) points.push_back({j,i});
 		}
+	if(points.size()==0)	//no white pixel in image
+	{
+		cout<<"No white pixel in image"<<endl;
+		return -1;
+	}
+
 
 	float a, b, c;
 	float best_a=0, best_b=0, best_c=0;
@@ -102,15 +116,15 @@ int main()
 	printf("\nNumber of matches(first lane): %d\n", best_matches);
 
 	//mark the points which lie on the best curve and remove these points from original image
-	Mat output1(img.rows,img.cols,CV_8UC3,Scalar(0,0,0));
+	Mat output_first_lane(img.rows,img.cols,CV_8UC3,Scalar(0,0,0));
 	for(i=0;i<points.size();i++)
 		if(on_curve(points[i],best_a,best_b,best_c)==true)
 		{
-			output1.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
+			output_first_lane.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
 			copy.at<uchar>(points[i].y,points[i].x)=0;
 		}
 	//imshow("single lane", copy);
-	imshow("first lane", output1);
+	imshow("first lane", output_first_lane);
 
 
 	//
@@ -160,20 +174,30 @@ int main()
 
 	printf("Number of matches(second lane): %d\n", best_matches);
 
+	int threshold=2000;
+	if(best_matches<=threshold)	//pixels detected in second lane below certain threshold i.e. only one lane in image
+	{
+		Mat output=output_first_lane;
+		imshow("Lanes", output);
+		imwrite("../images/lanes.jpg", output);
+		waitKey(0);
+		return 0;
+	}
+
 	//mark the points which lie on the best curve
-	Mat output2(copy.rows,copy.cols,CV_8UC3,Scalar(0,0,0));
+	Mat output_second_lane(copy.rows,copy.cols,CV_8UC3,Scalar(0,0,0));
 	for(i=0;i<points.size();i++)
 		if(on_curve(points[i],best_a,best_b,best_c)==true)
 		{
-			output2.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
+			output_second_lane.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
 		}
 	
-	imshow("second lane", output2);
+	imshow("second lane", output_second_lane);
 
 	Mat output(copy.rows,copy.cols,CV_8UC3,Scalar(0,0,0));
 	for(i=0;i<output.rows;i++)
 		for(j=0;j<output.cols;j++)
-			if(output1.at<Vec3b>(i,j)[0]==255 || output2.at<Vec3b>(i,j)[0]==255) output.at<Vec3b>(i,j)={0,0,255};
+			if(output_first_lane.at<Vec3b>(i,j)[0]==255 || output_second_lane.at<Vec3b>(i,j)[0]==255) output.at<Vec3b>(i,j)={0,0,255};
 	imshow("Lanes", output);
 	imwrite("../images/lanes.jpg", output);
 	waitKey(0);

@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 2.8)
-project( agv_cv )
-find_package( OpenCV REQUIRED )
-add_executable( noise_remover noise_remover.cpp )
-target_link_libraries( noise_remover ${OpenCV_LIBS} )
