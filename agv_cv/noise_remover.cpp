@@ -43,7 +43,7 @@ bool on_curve(co_ord p, float a, float b, float c) //checks if given point lies 
 
 int main()
 {
-	Mat img =imread( "../images/noise.png", CV_LOAD_IMAGE_GRAYSCALE );
+	Mat img =imread( "../images/noise.png", CV_LOAD_IMAGE_GRAYSCALE );	//read input image
 	imshow("original", img);
 	waitKey(1);
 
