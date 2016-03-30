@@ -12,26 +12,12 @@
 
 using namespace cv;
 using namespace std;
-Mat src; Mat src_gray;
-int thresh = 17;
-int max_thresh = 255;
-RNG rng(12345);
-void thresh_callback(int, void* );
 
 struct co_ord_ {int x;int y;};
 typedef struct co_ord_ co_ord;
 
 void compute_quadratic(co_ord p1, co_ord p2, co_ord p3, float& a, float& b, float &c)
 {
-	if(p1.y==p2.y || p1.y==p3.y)	//error check for denominator in expression below
-	{
-		a=0;
-		b=0;
-		c=0;
-		return;
-	}
-
-	
 	a=( ((float)p1.x-p2.x)/(p1.y-p2.y)- ((float)p2.x-p3.x)/(p2.y-p3.y) )/((float)p1.y-p3.y);
 	b=( ((float)p1.x-p2.x)- a*(p1.y*p1.y- p2.y*p2.y) )/((float)p1.y-p2.y);
 	c=p1.x-a*p1.y*p1.y-b*p1.y;
@@ -48,8 +34,8 @@ bool on_curve(co_ord p, float a, float b, float c) //checks if given point lies 
 
 int main()
 {
-	Mat img =imread( "/home/harshit/Downloads/test1.jpg", CV_LOAD_IMAGE_GRAYSCALE );	//read input image
-	imshow("original", img);
+	Mat img =imread( "/home/harshit/Desktop/noise2.png", CV_LOAD_IMAGE_GRAYSCALE );
+	//imshow("original", img);
 	waitKey(1);
 
 
@@ -61,7 +47,8 @@ int main()
 	waitKey(3000);*/                              //erosion and dilution
 
 	medianBlur ( img, img, 15 );
-	//imshow("median blurred", img);
+	imshow("median blurred", img);
+	//waitKey(1);
 
 	Mat copy=img.clone();
 
@@ -74,12 +61,6 @@ int main()
 		{
 			if(img.at<uchar>(i,j)>=20) points.push_back({j,i});
 		}
-	if(points.size()==0)	//no white pixel in image
-	{
-		cout<<"No white pixel in image"<<endl;
-		return -1;
-	}
-
 
 	float a, b, c;
 	float best_a=0, best_b=0, best_c=0;
@@ -103,6 +84,8 @@ int main()
 		while(p1.y==p2.y || p1.y==p3.y);
 		//compute curve corresponding to this three points
 		compute_quadratic(p1,p2,p3,a,b,c);
+		
+
 		//find number of points lying on this curve
 		matches=0;
 		for(i=0;i<points.size();i++)
@@ -116,19 +99,21 @@ int main()
 			best_c=c;
 		}
 	}
+	float dir[2];
+	dir[0]=best_c;
 
 	printf("\nNumber of matches(first lane): %d\n", best_matches);
 
 	//mark the points which lie on the best curve and remove these points from original image
-	Mat output_first_lane(img.rows,img.cols,CV_8UC3,Scalar(0,0,0));
+	Mat output1(img.rows,img.cols,CV_8UC3,Scalar(0,0,0));
 	for(i=0;i<points.size();i++)
 		if(on_curve(points[i],best_a,best_b,best_c)==true)
 		{
-			output_first_lane.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
+			output1.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
 			copy.at<uchar>(points[i].y,points[i].x)=0;
 		}
 	//imshow("single lane", copy);
-	imshow("first lane", output_first_lane);
+	//imshow("first lane", output1);
 
 
 	//
@@ -175,71 +160,37 @@ int main()
 			best_c=c;
 		}
 	}
+	dir[1]=best_c;
 
 	printf("Number of matches(second lane): %d\n", best_matches);
 
-	int threshold=2000;
-	if(best_matches<=threshold)	//pixels detected in second lane below certain threshold i.e. only one lane in image
-	{
-		Mat output=output_first_lane;
-		imshow("Lanes", output);
-		imwrite("../images/lanes.jpg", output);
-		waitKey(0);
-		return 0;
-	}
-
 	//mark the points which lie on the best curve
-	Mat output_second_lane(copy.rows,copy.cols,CV_8UC3,Scalar(0,0,0));
+	Mat output2(copy.rows,copy.cols,CV_8UC3,Scalar(0,0,0));
 	for(i=0;i<points.size();i++)
 		if(on_curve(points[i],best_a,best_b,best_c)==true)
 		{
-			output_second_lane.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
+			output2.at<Vec3b>(points[i].y, points[i].x)={255,255,0};
 		}
 	
-	imshow("second lane", output_second_lane);
+	if(dir[0]>dir[1]) 
+	{
+		imshow("right lane", output1);
+		imshow("left lane",output2);
+		waitKey(10000000);
+	}
+	else
+	{
+
+		imshow("right lane", output2);
+		imshow("left lane",output1);
+		waitKey(1000000);	
+	}
 
 	Mat output(copy.rows,copy.cols,CV_8UC3,Scalar(0,0,0));
 	for(i=0;i<output.rows;i++)
 		for(j=0;j<output.cols;j++)
-			if(output_first_lane.at<Vec3b>(i,j)[0]==255 || output_second_lane.at<Vec3b>(i,j)[0]==255) output.at<Vec3b>(i,j)={0,0,255};
-	imshow("Lanes", output);
-
-		//Left right lane detection
-
-
- src = output;
-
-  /// Convert image to gray and blur it
-  cvtColor( src, src_gray, CV_BGR2GRAY );
-  blur( src_gray, src_gray, Size(3,3) );
-
-  /// Create Window
-  char* source_window = "Source";
-  namedWindow( source_window, CV_WINDOW_AUTOSIZE );
-  imshow( source_window, src );
-
-  createTrackbar( " Threshold:", "Source", &thresh, max_thresh, thresh_callback );
-  thresh_callback( 0, 0 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			if(output1.at<Vec3b>(i,j)[0]==255 || output2.at<Vec3b>(i,j)[0]==255) output.at<Vec3b>(i,j)={0,0,255};
+	//imshow("Lanes", output);
 	imwrite("../images/lanes.jpg", output);
 	waitKey(0);
 
@@ -248,73 +199,4 @@ int main()
 	
 	return 0;
 	
-}
-
-
-void thresh_callback(int, void* )
-{
-  Mat threshold_output;
-  vector<vector<Point> > contours;
-  vector<Vec4i> hierarchy;
-
-  /// Detect edges using Threshold
-  threshold( src_gray, threshold_output, thresh, 255, THRESH_BINARY );
-  /// Find contours
-  findContours( threshold_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
-  /// Find the rotated rectangles and ellipses for each contour
-  vector<RotatedRect> minRect( contours.size() );
-  vector<RotatedRect> minEllipse( contours.size() );
-
-  float minx=99999999;
-  for( int i = 0; i < contours.size(); i++ )
-     { minRect[i] = minAreaRect( Mat(contours[i]) );
-            
-            if(minRect[i].center.x<minx)
-            {
-              minx=minRect[i].center.x;
-            }
-
-            cout<<minRect[i].center.x<<endl;
-            if( contours[i].size() > 5 )
-         { minEllipse[i] = fitEllipse( Mat(contours[i]) ); }
-     }
-    
-  /// Draw contours + rotated rects + ellipses
-  Mat drawing = Mat::zeros( threshold_output.size(), CV_8UC3 );
-  for( int i = 0; i< contours.size(); i++ )
-     {
-      Point2f cent_point;
-      cent_point.x=0;
-      cent_point.y=0;
-      Scalar color;
-       //Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
-       if(minRect[i].center.x==minx)
-       {
-        color=Scalar(255,0,0);
-      }
-      else
-      {
-        color=Scalar(0,255,0);
-      }
-       // contour
-       drawContours( drawing, contours, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
-       // ellipse
-       //ellipse( drawing, minEllipse[i], color, 2, 8 );
-       // rotated rectangle
-       Point2f rect_points[4]; minRect[i].points( rect_points );
-       for( int j = 0; j < 4; j++ )
-       {
-          line( drawing, rect_points[j], rect_points[(j+1)%4], color, 1, 8 );
-         /* cent_point.x=cent_point.x+rect_points[j].x;
-          cent_point.y=cent_point.y+rect_points[j].y;
-
-          cout<<cent_point.x/3<<"  "<<cent_point.y/3;*/
-
-       }
-     }
-
-  /// Show in a window
-  namedWindow( "Contours", CV_WINDOW_AUTOSIZE );
-  imshow( "Contours", drawing );
 }
